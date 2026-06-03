@@ -2,17 +2,16 @@
     'use strict';
 
     function TorrServerMultiPlugin() {
-        // Добавляем пункт в главное меню Настроек Lampa принудительно
-        Lampa.Settings.main = Lampa.Settings.main || {};
-        
-        Lampa.Settings.add({
-            title: 'TorrServer (Multi)',
-            type: 'extended',
-            name: 'torrserver_multi', // Новое уникальное имя для компонента настроек
-            icon: '<svg xmlns="http://w3.org" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y1="15"></line></svg>'
-        });
+        // Создаем пункт меню сразу, не дожидаясь appready
+        if (Lampa.Settings && Lampa.Settings.main) {
+            Lampa.Settings.main.torrserver_multi = {
+                title: 'TorrServer (Multi)',
+                type: 'extended',
+                icon: '<svg xmlns="http://w3.org" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y1="15"></line></svg>'
+            };
+        }
 
-        // Инициализация кастомных настроек в Lampa
+        // Слушатель открытия нашего меню
         Lampa.Settings.listener.follow('open', function (e) {
             if (e.name == 'torrserver_multi') {
                 var box = e.body;
@@ -63,7 +62,7 @@
                 );
 
                 var active = Lampa.Storage.get('torr_srv_active', '1');
-                select_html.find('.settings-param__value').text('Сервер #' + active);
+                select_html.find('.settings-html__value, .settings-param__value').text('Сервер #' + active);
 
                 select_html.on('hover:enter', function () {
                     Lampa.Select.show({
@@ -99,6 +98,6 @@
         });
     }
 
-    if (window.appready) TorrServerMultiPlugin();
-    else Lampa.Listener.follow('app', function (e) { if (e.type == 'ready') TorrServerMultiPlugin(); });
+    // Запуск плагина немедленно, без ожидания событий готовности приложения
+    TorrServerMultiPlugin();
 })();
