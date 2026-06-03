@@ -2,14 +2,24 @@
     'use strict';
 
     function TorrServerMultiPlugin() {
+        // Добавляем пункт TorrServer в главное меню Настроек Lampa, если его там еще нет
+        Lampa.Settings.main = Lampa.Settings.main || {};
+        
+        // Создаем сам пункт меню в Настройках
+        Lampa.Settings.add({
+            title: 'TorrServer (Multi)',
+            type: 'extended', // тип расширенных настроек
+            name: 'torrserver', // имя компонента, на которое сработает ваш слушатель ниже
+            icon: '<svg xmlns="http://w3.org" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y1="15"></line></svg>'
+        });
+
         // 1. Инициализация кастомных настроек в Lampa
         Lampa.Settings.listener.follow('open', function (e) {
             if (e.name == 'torrserver') {
                 var box = e.body;
 
-                // Удаляем стандартные поля, чтобы они не путали
-                box.find('.settings-param:contains("Основная ссылка")').remove();
-                box.find('.settings-param:contains("Дополнительная ссылка")').remove();
+                // Очищаем бокс от старых элементов (на случай повторного входа)
+                box.empty();
 
                 // Создаем массив с новыми полями для 4-х серверов
                 var servers = [
@@ -74,7 +84,7 @@
                             Lampa.Storage.set('torr_srv_active', item.id);
                             select_html.find('.settings-param__value').text(item.title);
                             
-                            // Самое главное: подменяем системную ссылку Lampa на выбранную нами
+                            // Подменяем системную ссылку Lampa на выбранную нами
                             var target_url = Lampa.Storage.get('torr_srv_' + item.id, '');
                             Lampa.Storage.set('torrserver_url', target_url);
                         }
